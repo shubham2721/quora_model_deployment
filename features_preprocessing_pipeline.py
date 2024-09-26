@@ -6,7 +6,7 @@ import gc
 
 import re
 from nltk.corpus import stopwords
-import distance
+# import distance
 from nltk.stem import PorterStemmer
 import re
 from nltk.corpus import stopwords
@@ -161,12 +161,12 @@ def get_token_features(q1,q2):
 
 # get the Longest Common sub string
 
-def get_longest_substr_ratio(a, b):
-    strs = list(distance.lcsubstrings(a, b))
-    if len(strs) == 0:
-        return 0
-    else:
-        return len(strs[0]) / (min(len(a), len(b)) + 1)
+# def get_longest_substr_ratio(a, b):
+#     strs = list(distance.lcsubstrings(a, b))
+#     if len(strs) == 0:
+#         return 0
+#     else:
+#         return len(strs[0]) / (min(len(a), len(b)) + 1)
 
 # Creating Columns for each features and also including some advanced fuzzy features
 def feature_extraction(df):
