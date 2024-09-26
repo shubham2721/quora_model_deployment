@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Question Duplicacy</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        /* Form Styling */
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #4CAF50;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Tooltip Styling */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 5px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 150%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Progress Bar */
+        .progress {
+            height: 8px;
+            background-color: #ddd;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Loading Spinner */
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #loading img {
+            width: 50px;
+            height: 50px;
+        }
+
+        /* Result Styling */
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .result h2 {
+            color: #4CAF50;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .result p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+            button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Check Questions Duplicacy</h1>
+        <form id="duplicacyForm">
+            <div class="tooltip">
+                <label for="id1">ID 1:</label>
+                <span class="tooltiptext">Enter the first question's ID</span>
+            </div>
+            <input type="number" id="id1" name="id1" required>
+
+            <div class="tooltip">
+                <label for="id2">ID 2:</label>
+                <span class="tooltiptext">Enter the second question's ID</span>
+            </div>
+            <input type="number" id="id2" name="id2" required>
+
+            <div class="tooltip">
+                <label for="question1">Question 1:</label>
+                <span class="tooltiptext">Enter the first question</span>
+            </div>
+            <input type="text" id="question1" name="question1" required>
+
+            <div class="tooltip">
+                <label for="question2">Question 2:</label>
+                <span class="tooltiptext">Enter the second question</span>
+            </div>
+            <input type="text" id="question2" name="question2" required>
+
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <button type="submit">Check Duplicacy</button>
+        </form>
+
+        <div id="loading">
+            <img src="https://i.gifer.com/YCZH.gif" alt="Loading...">
+            <p>Checking for duplicacy...</p>
+        </div>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function updateProgress() {
+            const id1 = document.getElementById("id1").value;
+            const id2 = document.getElementById("id2").value;
+            const question1 = document.getElementById("question1").value;
+            const question2 = document.getElementById("question2").value;
+
+            let filledCount = 0;
+            if (id1) filledCount++;
+            if (id2) filledCount++;
+            if (question1) filledCount++;
+            if (question2) filledCount++;
+
+            const percentage = (filledCount / 4) * 100;
+            document.getElementById("progressBar").style.width = percentage + "%";
+        }
+
+        document.querySelectorAll("input").forEach(input => {
+            input.addEventListener("input", updateProgress);
+        });
+
+        document.getElementById("duplicacyForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            document.getElementById("loading").style.display = "block";
+
+            const id1 = document.getElementById("id1").value;
+            const id2 = document.getElementById("id2").value;
+            const question1 = document.getElementById("question1").value;
+            const question2 = document.getElementById("question2").value;
+
+            const payload = {
+                id1: parseInt(id1),
+                id2: parseInt(id2),
+                question1: question1,
+                question2: question2
+            };
+
+            try {
+                const response = await fetch("/api/check-duplicacy", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                document.getElementById("loading").style.display = "none";
+
+                const data = await response.json();
+                document.getElementById("result").innerHTML = `
+                    <div class="result">
+                        <h2>Result: ${data.isDuplicate}</h2>
+                        <p>Probability: ${data.probability}</p>
+                    </div>`;
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("result").innerHTML = `<div class="result"><p><strong>Error:</strong> Could not process the request.</p></div>`;
+            }
+        });
+    </script>
+</body>
+</html>
